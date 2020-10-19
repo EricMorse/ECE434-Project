@@ -54,23 +54,24 @@ GPIO.wait_for_edge(INPUT, GPIO.BOTH, timeout=5000)
 # program will do, and later on, you can check if that event was detected.
 
 # # A simple example of this is as follows:
-# GPIO.add_event_detect(INPUT, GPIO.FALLING)
-# #your amazing code here
-# #detect wherever:
-# time.sleep(5)
-# if GPIO.event_detected("P8_14"):
-#     print("event detected!")
+GPIO.add_event_detect(INPUT, GPIO.FALLING)
+#your amazing code here
+#detect wherever: 
+print("waiting")
+time.sleep(5)
+if GPIO.event_detected("P8_14"):
+   print("event detected!")
     
 # # Or if you want you can define a callback function.
 
-# def my_callback(channel):
-#     print('Edge detected on channel %s'%channel)
+def my_callback(channel):
+   print('Edge detected on channel %s'%channel)
 
-# # Then have it called when the event occurs
-# GPIO.remove_event_detect("P8_14")
-# GPIO.add_event_detect("P8_14", GPIO.BOTH, callback=my_callback) 
+# Then have it called when the event occurs
+GPIO.remove_event_detect("P8_14")
+GPIO.add_event_detect("P8_14", GPIO.BOTH, callback=my_callback) 
 
-# while True:             # Do something while waiting for event
-#     time.sleep(100)
-    
-# GPIO.cleanup()
+while True:             # Do something while waiting for event
+   time.sleep(100)
+ 
+GPIO.cleanup()
