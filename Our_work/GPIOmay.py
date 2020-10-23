@@ -2,6 +2,7 @@
 """gpiod-based GPIO functionality of a BeagleBone using Python."""
 import gpiod
 import sys
+import threading
 
 ALT0 = 4
 BOTH = 3
@@ -19,6 +20,18 @@ VERSION = '0.0.0'
 ports={}        # Dictionary of channel/line pairs that are open
 
 CONSUMER='GPIOmay'
+
+class myThread (threading.Thread):
+    def __init__(self, threadID, name, counter):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+    def run(self):
+        # Get lock to synchronize threads
+        #threadLock.acquire()
+        if self.threadID == 1:
+            function_a()
+        if self.threadID == 2:
+            function_b()
 
 def setup(channel, direction):
     """Set up the GPIO channel, direction and (optional) pull/up down control.
@@ -138,24 +151,26 @@ def add_event_detect(channel, edge):
     edge         - RISING, FALLING or BOTH
     [callback]   - A callback function for the event (optional)
     [bouncetime] - Switch bounce timeout in ms for callback"""
+    thread1 = myThead(1)
+    thread2 = myThead(2)
     
-    line=ports[channel][0]
-    print(line.to_list())
-    print(line.to_list()[0].event_read())
-    if edge == RISING:
-        print("RISING Edge")
-        ev_edge = gpiod.LINE_REQ_EV_RISING_EDGE
-    elif edge == FALLING:
-        print("Falling Edge")
-        ev_edge = gpiod.LINE_REQ_EV_FALLING_EDGE
-    elif edge == BOTH:
-        print("BOTH Edges")
-        ev_edge = gpiod.LINE_REQ_EV_BOTH_EDGES
-    else:
-        #print("Unknown edge type: " + str(edge))
-        ev_edge = gpiod.LINE_REQ_EV_FALLING_EDGE
+    #line=ports[channel][0]
+    #print(line.to_list())
+    #print(line.to_list()[0].event_read())
+    #if edge == RISING:
+    #    print("RISING Edge")
+    #    ev_edge = gpiod.LINE_REQ_EV_RISING_EDGE
+    #elif edge == FALLING:
+    #    print("Falling Edge")
+    #    ev_edge = gpiod.LINE_REQ_EV_FALLING_EDGE
+    #elif edge == BOTH:
+    #    print("BOTH Edges")
+    #    ev_edge = gpiod.LINE_REQ_EV_BOTH_EDGES
+    #else:
+    #    #print("Unknown edge type: " + str(edge))
+    #    ev_edge = gpiod.LINE_REQ_EV_FALLING_EDGE
 
-    line.to_list()[0].add_event_detect(channel, ev_edge)
+    #line.to_list()[0].add_event_detect(channel, ev_edge)
     
 def event_detected(channel):
     """Returns True if an edge has occured on a given GPIO.  
