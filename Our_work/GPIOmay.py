@@ -3,6 +3,10 @@
 import gpiod
 import sys
 import threading
+import importlib
+
+gpiomon = input('gpiomon')
+importlib.import_module(gpiomon)
 
 ALT0 = 4
 BOTH = 3
@@ -21,17 +25,30 @@ ports={}        # Dictionary of channel/line pairs that are open
 
 CONSUMER='GPIOmay'
 
-class myThread (threading.Thread):
-    def __init__(self, threadID, name, counter):
+"""class myThread (threading.Thread):
+    def __init__(self, threadID, channel, edge):
         threading.Thread.__init__(self)
         self.threadID = threadID
+        self.channel = channel
+        self.old_value = input(channel)
+        self.edge = edge
+        run()
     def run(self):
         # Get lock to synchronize threads
         #threadLock.acquire()
+	check_value(self.channel)
+
         if self.threadID == 1:
             function_a()
         if self.threadID == 2:
             function_b()
+    def check_value():
+        if input(channel) != self.old_value:
+	    add_event_detect(channel, edge)
+	    return
+	else:
+	    run()
+"""
 
 def setup(channel, direction):
     """Set up the GPIO channel, direction and (optional) pull/up down control.
@@ -151,7 +168,7 @@ def add_event_detect(channel, edge):
     edge         - RISING, FALLING or BOTH
     [callback]   - A callback function for the event (optional)
     [bouncetime] - Switch bounce timeout in ms for callback"""
-    thread1 = myThead(1)
+    thread1 = myThead(1, channel)
     thread2 = myThead(2)
     
     #line=ports[channel][0]
@@ -172,6 +189,7 @@ def add_event_detect(channel, edge):
 
     #line.to_list()[0].add_event_detect(channel, ev_edge)
     
+
 def event_detected(channel):
     """Returns True if an edge has occured on a given GPIO.  
    
