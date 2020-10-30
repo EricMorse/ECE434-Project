@@ -3,10 +3,6 @@
 import gpiod
 import sys
 import threading
-import importlib
-
-gpiomon = input('gpiomon')
-importlib.import_module(gpiomon)
 
 ALT0 = 4
 BOTH = 3

@@ -35,9 +35,53 @@ def uboot_overlay_enabled():
 def load_device_tree(name):
 	if uboot_overlay_enabled():
 		return "OK"
-	print("{}{}{}".format(ctrl_dir, sizeof(ctrl_dir), "/sys/devices/platform/bone_capemgr"))
+	if name == "UART":
+	# We are attempting to use config-pin setups instead of slot file alterations (Eric Morse and Joshua Key)
+	#	os.system("config-pin
+	# print("{}{}{}".format(ctrl_dir, sizeof(ctrl_dir), "/sys/devices/platform/bone_capemgr"))
+	# file = open(slots, mode = 'r')
+	# if not file:
+	# 	return "CAPE"
+	# while file.read(line, sizeof(line, file)):
+	#	pos =  line.find(name)
+	#	if pos >= 0:
+	#		if line[pos:]:
+	#			close(file)
+	#			return "OK"
+	#print("{}".format(name), end='', file = file)
+	#close(file)
+	sleep(0.2)
+	return "OK"
+
+# Don't really need device_tree_loaded function
+def device_tree_loaded(name):
+	if uboot_overlay_enabled():
+		return 1
+	# print("{}{}{}".format(ctrl_dir, sizeof(ctrl_dir), "/sys/devices/platform/bone_capemgr"))
+	if not file:
+		return -1
 	file = open(slots, mode = 'r')
-	if !file:
-		return "CAPE"
-	while file.read(line, sizeof(line, file))
+	while file.read(line, sizeof(line, file)):
+		pos = line.find(name)
+		if pos >= 0:
+			if line[pos:]:
+				close(file)
+				return 1
+	close(file)
+	return 0
+
 # Need unload_device_tree function
+def unload_device_tree(name):
+	file = open(slots, mode='r')
+	if not file:
+		return "SYSFS"
+	while file.read(line, sizeof(line, file)):
+		pos = line.find(name)
+		if pos >= 0:
+			if line[pos:]:
+				slot_line =  [string(x) for x in line.split(":") is x.strip()]
+				print("{}".format(slot_line), end='', file = file)
+				close(file)
+				return "OK"
+	close(file)
+	return "OK"
