@@ -46,32 +46,32 @@ else:
 
 # The wait_for_edge method is blocking, and will wait until something happens:
 # print("waiting for edge...", end='')
-GPIO.wait_for_edge(INPUT, GPIO.BOTH, timeout=5000)
-# print("got it.")
+GPIO.wait_for_edge(INPUT, GPIO.HIGH, timeout=5000)
+
 
 # Another option, that is non-blocking is to add an event to detect. 
 # First, you setup your event to watch for, then you can do whatever else your 
 # program will do, and later on, you can check if that event was detected.
 
+def my_callback(channel):
+    print('Edge detected on channel {}'.format(channel))
+
 # # A simple example of this is as follows:
-GPIO.add_event_detect(INPUT, GPIO.FALLING)
+GPIO.add_event_detect(INPUT, GPIO.FALLING, callback = my_callback)
 #your amazing code here
 #detect wherever: 
-print("waiting")
 time.sleep(5)
-if GPIO.event_detected("P8_14"):
-   print("event detected!")
+#if GPIO.event_detected(INPUT):
+#   print("event detected again!")
     
 # # Or if you want you can define a callback function.
 
-def my_callback(channel):
-   print('Edge detected on channel %s'%channel)
-
 # Then have it called when the event occurs
-GPIO.remove_event_detect("P8_14")
-GPIO.add_event_detect("P8_14", GPIO.BOTH, callback=my_callback) 
+#GPIO.remove_event_detect("P8_14")
+#GPIO.add_event_detect("P8_14", GPIO.BOTH, callback=my_callback) 
 
-while True:             # Do something while waiting for event
-   time.sleep(100)
+#while True:             # Do something while waiting for event
+#   time.sleep(100)
  
 GPIO.cleanup()
+print("all done!")

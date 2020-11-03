@@ -1,6 +1,5 @@
-if -1:
-	print("-1")
-if 0:
-	print("0")
-else:
-	print("1")
+import GPIOmay as GPIO
+channel = 'GPMC_A2'
+GPIO.setup(channel, GPIO.OUT)
+GPIO.wait_for_event(channel)
+GPIO.event_detected(channel)

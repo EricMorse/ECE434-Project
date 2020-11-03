@@ -21,30 +21,38 @@ ports={}        # Dictionary of channel/line pairs that are open
 
 CONSUMER='GPIOmay'
 
-"""class myThread (threading.Thread):
-    def __init__(self, threadID, channel, edge):
+class myThread(threading.Thread):
+    def __init__(self, threadID, channel, edge, callback, debounce):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.channel = channel
-        self.old_value = input(channel)
+        self.old_value = input(channel)[0]
         self.edge = edge
-        run()
+        self.callback = callback
+        self.debounce = debounce
+        self.run()
     def run(self):
+        print("Run the thread")
         # Get lock to synchronize threads
         #threadLock.acquire()
-	check_value(self.channel)
+        wait_for_edge(self.channel, self.edge)
+        print("Event detected")
+        print(self.old_value)
+        if self.edge == BOTH:
+                self.callback()
+                self.old_value = input(self.channel)
+        else:
+                if self.old_value == 0:
+                        print("we got it!")
+                        event_detected = HIGH
+                else:
+                        event_detected = LOW
 
-        if self.threadID == 1:
-            function_a()
-        if self.threadID == 2:
-            function_b()
-    def check_value():
-        if input(channel) != self.old_value:
-	    add_event_detect(channel, edge)
-	    return
-	else:
-	    run()
-"""
+                if self.edge == event_detected:
+                        self.callback()
+                self.old_value = input(self.channel)[0]
+        self.run()
+
 
 def setup(channel, direction):
     """Set up the GPIO channel, direction and (optional) pull/up down control.
@@ -157,15 +165,15 @@ def wait_for_edge(channel, edge, timeout=-1):
     
     return line.event_wait(sec=int(timeout/1000))
 
-def add_event_detect(channel, edge):
+def add_event_detect(channel, edge, callback=None, debounce=0):
     """Enable edge detection events for a particular GPIO channel.
   
     channel      - board pin number.
     edge         - RISING, FALLING or BOTH
     [callback]   - A callback function for the event (optional)
     [bouncetime] - Switch bounce timeout in ms for callback"""
-    thread1 = myThead(1, channel)
-    thread2 = myThead(2)
+    print("Initialize the thread")
+    thread2 = myThread(2, channel, edge, callback, debounce)
     
     #line=ports[channel][0]
     #print(line.to_list())
@@ -186,22 +194,20 @@ def add_event_detect(channel, edge):
     #line.to_list()[0].add_event_detect(channel, ev_edge)
     
 
-def event_detected(channel):
-    """Returns True if an edge has occured on a given GPIO.  
-   
-    You need to enable edge detection using add_event_detect() first.
-    channel - gpio channel"""
-    line=ports[channel][0]
-    return line.event_detected(channel)
+#def event_detected(channel):
+#    """Returns True if an edge has occured on a given GPIO.  
+#   
+#    You need to enable edge detection using add_event_detect() first.
+#    channel - gpio channel"""
+#    line=ports[channel][0]
+#    return line.event_detected(channel)
        
 def cleanup():
     """Clean up by resetting all GPIO channels that have been used by 
     this program to INPUT with no pullup/pulldown and no event detection."""
-    
-    print("cleanup()")
+    global ports
     print(ports)
     for channel, val in ports.items():
-        print(channel)
         ret = val[0].release()
         if ret:
             print(ret)
