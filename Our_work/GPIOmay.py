@@ -2,7 +2,7 @@
 """gpiod-based GPIO functionality of a BeagleBone using Python."""
 import gpiod
 import sys
-import threading
+from multiprocessing import Process
 
 ALT0 = 4
 BOTH = 3
@@ -16,43 +16,78 @@ PUD_OFF = 0
 PUD_UP = 2
 RISING = 1
 VERSION = '0.0.0'
-
+threads=[]
 ports={}        # Dictionary of channel/line pairs that are open
 
 CONSUMER='GPIOmay'
 
-class myThread(threading.Thread):
-    def __init__(self, threadID, channel, edge, callback, debounce):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.channel = channel
-        self.old_value = input(channel)[0]
-        self.edge = edge
-        self.callback = callback
-        self.debounce = debounce
-        self.run()
-    def run(self):
-        print("Run the thread")
+#class myThread(threading.Thread):
+#    def __init__(self, threadID, channel, edge, callback, debounce):
+#        threading.Thread.__init__(self)
+#        self.threadID = threadID
+#        self.channel = channel
+#        self.old_value = input(channel)[0]
+#        self.edge = edge
+#        self.callback = callback
+#        self.debounce = debounce
+#        # self.run()
+#    def run(self):
+#       # print("Run the thread")
+#        # Get lock to synchronize threads
+#        #threadLock.acquire()
+#        event_detected = None
+#        print("waiting for edge")
+#        wait_for_edge(self.channel, self.edge)
+#        print("Event detected")
+#        print(self.old_value)
+#        if self.edge == BOTH:
+#                #print("Both triggered!")
+#                self.callback()
+#                self.old_value = input(self.channel)
+#        else:
+#                if self.old_value == 0 and self.edge == RISING:
+#                        print("we got high!")
+#                        event_detected = RISING
+#                elif self.old_value == 1 and self.edge == FALLING:
+#                        print("We got low!")
+#                        event_detected = FALLING#
+#
+#                if self.edge == event_detected:
+#                        print("Callback called!")
+#                        self.callback(self.channel)
+#                self.old_value = input(self.channel)[0]
+#        self.run()
+
+def run(channel, edge, callback=None, debounce=0):
+        # print("Run the thread")
         # Get lock to synchronize threads
         #threadLock.acquire()
-        wait_for_edge(self.channel, self.edge)
-        print("Event detected")
-        print(self.old_value)
-        if self.edge == BOTH:
-                self.callback()
-                self.old_value = input(self.channel)
-        else:
-                if self.old_value == 0:
-                        print("we got it!")
-                        event_detected = HIGH
-                else:
-                        event_detected = LOW
-
-                if self.edge == event_detected:
-                        self.callback()
-                self.old_value = input(self.channel)[0]
-        self.run()
-
+        x = True
+        while x:
+            recv(x)
+            event_detected = None
+            print("waiting for edge")
+            old_value = input(channel)[0]
+            wait_for_edge(channel, edge)
+            print("Event detected")
+            if edge == BOTH:
+                    print("Both triggered!")
+                    callback(channel)
+                    old_value = input(channel)[0]
+            else:
+                    if old_value == 0:
+                            print("we got high!")
+                            event_detected = RISING
+                    else:
+                            print("We got low!")
+                            event_detected = FALLING
+                    print("edge = {}".format(edge))
+                    print("event_detected = {}".format(event_detected))
+                    if edge is event_detected:
+                            print("Callback called!")
+                            callback(channel)
+                    old_value = input(channel)[0]	
+        
 
 def setup(channel, direction):
     """Set up the GPIO channel, direction and (optional) pull/up down control.
@@ -134,14 +169,13 @@ def input(channel):
     # print(channel)
     return ports[channel][0].get_values()
 
-def wait_for_edge(channel, edge, timeout=-1):
+def wait_for_edge(channel, edge, timeout = -1):
     """Wait for an edge.
     
     channel - gpio channel
     edge - RISING, FALLING or BOTH
     timeout (optional) - time to wait in miliseconds. -1 will wait forever (default)"""
     # print("wait_for_edge()")
-
     # print(ports)
     line=ports[channel][0]
     chip=ports[channel][1]
@@ -162,8 +196,10 @@ def wait_for_edge(channel, edge, timeout=-1):
     line = chip.get_lines([offset])
     
     line.request(consumer=CONSUMER, type=ev_edge)
-    
-    return line.event_wait(sec=int(timeout/1000))
+    x = None
+    while not x:
+       x = line.event_wait(sec = 1)
+    return line.event_wait()
 
 def add_event_detect(channel, edge, callback=None, debounce=0):
     """Enable edge detection events for a particular GPIO channel.
@@ -172,9 +208,13 @@ def add_event_detect(channel, edge, callback=None, debounce=0):
     edge         - RISING, FALLING or BOTH
     [callback]   - A callback function for the event (optional)
     [bouncetime] - Switch bounce timeout in ms for callback"""
+    global threads
     print("Initialize the thread")
-    thread2 = myThread(2, channel, edge, callback, debounce)
-    
+    process2 = Process(target = run, args = (channel, edge, callback, debounce))
+    threads.append(process2)
+    process2.start()
+    # thread2.run()
+    print("The rest of the function gets to run")
     #line=ports[channel][0]
     #print(line.to_list())
     #print(line.to_list()[0].event_read())
@@ -190,7 +230,7 @@ def add_event_detect(channel, edge, callback=None, debounce=0):
     #else:
     #    #print("Unknown edge type: " + str(edge))
     #    ev_edge = gpiod.LINE_REQ_EV_FALLING_EDGE
-
+    return
     #line.to_list()[0].add_event_detect(channel, ev_edge)
     
 
@@ -206,7 +246,11 @@ def cleanup():
     """Clean up by resetting all GPIO channels that have been used by 
     this program to INPUT with no pullup/pulldown and no event detection."""
     global ports
-    print(ports)
+    global threads
+    for thread in threads:
+        thread.send(False)
+        thread.join()
+        thread.close()
     for channel, val in ports.items():
         ret = val[0].release()
         if ret:
