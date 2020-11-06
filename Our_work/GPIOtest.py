@@ -9,7 +9,8 @@ import time
 
 # CHANNEL='P9_14'
 CHANNEL='GPMC_A2'       # P9_14
-INPUT="GPMC_AD10"       # P8_14
+INPUT1="GPMC_AD10"       # P8_14
+INPUT2="GPMC_A0"        # P9_15
 
 GPIO.setup(CHANNEL, GPIO.OUT)
 # while True:
@@ -30,14 +31,14 @@ GPIO.output(CHANNEL, [GPIO.HIGH])     # You can also write 1 instead.
 
 
 # You can also set pins as inputs as follows:
-GPIO.setup(INPUT, GPIO.IN)
-
+GPIO.setup(INPUT1, GPIO.IN)
+GPIO.setup(INPUT2, GPIO.IN)
 # Once you've done that, you can access the input value in a few different ways. 
 # The first, and easiest way is just polling the inputs, such as in a loop that keeps checking them:
-if GPIO.input(INPUT)[0]:  # P8_14
-    print("HIGH")
-else:
-    print("LOW")
+#if GPIO.input(INPUT)[0]:  # P8_14
+#    print("HIGH")
+#else:
+#    print("LOW")
 
 # You can also wait for an edge. This means that if the value is falling 
 # (going from 3.3V down to 0V), rising (going from 0V up to 3.3V), 
@@ -54,11 +55,11 @@ else:
 # program will do, and later on, you can check if that event was detected.
 
 def my_callback(channel):
-    print("callback called")
-    #print('Edge detected on channel {}'.format(channel))
+    print('Edge detected on channel {}'.format(channel))
 
 # # A simple example of this is as follows:
-GPIO.add_event_detect(INPUT, GPIO.FALLING, callback = my_callback)
+GPIO.add_event_detect(INPUT1, GPIO.FALLING, callback = my_callback)
+GPIO.add_event_detect(INPUT2, GPIO.RISING, callback = my_callback)
 #your amazing code here
 #detect wherever: 
 #time.sleep(5)
@@ -72,7 +73,7 @@ GPIO.add_event_detect(INPUT, GPIO.FALLING, callback = my_callback)
 #GPIO.add_event_detect("P8_14", GPIO.BOTH, callback=my_callback) 
 
 #while True:             # Do something while waiting for event
-#   time.sleep(100)
+time.sleep(0)
  
 GPIO.cleanup()
 print("all done!")
