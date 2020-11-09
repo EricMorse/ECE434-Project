@@ -9,6 +9,7 @@ import time
 
 # CHANNEL='P9_14'
 CHANNEL='GPMC_A2'       # P9_14
+#CHANNEL='P9_14'
 INPUT1="GPMC_AD10"       # P8_14
 INPUT2="GPMC_A0"        # P9_15
 
