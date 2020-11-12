@@ -16,9 +16,9 @@ INPUT2="GPMC_A0"        # P9_15
 GPIO.setup(CHANNEL, GPIO.OUT)
 # while True:
 GPIO.output(CHANNEL, [GPIO.HIGH])     # You can also write 1 instead.
-time.sleep(0.1)
+time.sleep(1)
 GPIO.output(CHANNEL, [GPIO.LOW])     # You can also write 1 instead.
-time.sleep(0.1)
+time.sleep(1)
 GPIO.output(CHANNEL, [GPIO.HIGH])     # You can also write 1 instead.
     
 # GPIO.cleanup()
