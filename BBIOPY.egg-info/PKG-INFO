@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: BBIOPY
-Version: 0.1.2
+Version: 0.1.3
 Summary: Full python implementation of BBIO gpiod
 Home-page: https://github.com/EricMorse/ECE434-Project
 Author: Eric Morse, Joshua Key, and Mark Yoder

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
 	name="BBIOPY",
-	version="0.1.2",
+	version="0.1.3",
 	author="Eric Morse, Joshua Key, and Mark Yoder",
 	author_email="morsee@rose-hulman.edu",
 	description="Full python implementation of BBIO gpiod",

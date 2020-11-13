@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-import GPIOmay as GPIO
+
+from bbiopy import GPIOmay as GPIO
 import time
+
 
 LED="P9_14"
 #LED = "GPMC_A2"
