@@ -4,6 +4,12 @@ BBIOPY.egg-info/PKG-INFO
 BBIOPY.egg-info/SOURCES.txt
 BBIOPY.egg-info/dependency_links.txt
 BBIOPY.egg-info/top_level.txt
+BBIOPY.egg-info/build/lib/bbiopy/GPIOmay.py
+BBIOPY.egg-info/build/lib/bbiopy/PWMmay.py
+BBIOPY.egg-info/build/lib/bbiopy/PinMux.py
+BBIOPY.egg-info/build/lib/bbiopy/__init__.py
+BBIOPY.egg-info/build/lib/bbiopy/adc.py
+BBIOPY.egg-info/build/lib/bbiopy/uart.py
 bbiopy/GPIOmay.py
 bbiopy/PWMmay.py
 bbiopy/PinMux.py
